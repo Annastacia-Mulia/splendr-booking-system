@@ -9,7 +9,5 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-/splendrDemo/App
-/server.js
 # macOS
 .DS_Store
