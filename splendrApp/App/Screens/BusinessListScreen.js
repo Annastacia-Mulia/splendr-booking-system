@@ -7,8 +7,8 @@ const BusinessListScreen = ({ route }) => {
   const navigation = useNavigation();
 
   const handleSelectBusiness = (business) => {
-    // Navigate to ServiceListScreen passing the services details
-    navigation.navigate('ServiceListScreen', { services: business.services });
+    // Navigate to ServiceListScreen passing the business and its services
+    navigation.navigate('ServiceListScreen', { business });
   };
 
   const renderBusinessItem = ({ item }) => (

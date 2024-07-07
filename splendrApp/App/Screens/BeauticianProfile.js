@@ -1,4 +1,4 @@
-// ClientProfile.js
+// BeauticianProfile.js
 import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 const { width } = Dimensions.get('window');
 
-const ClientProfile = () => {
+const BeauticianProfile = () => {
   const navigation = useNavigation();
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
@@ -79,7 +79,7 @@ const ClientProfile = () => {
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerIcon} onPress={() => navigation.navigate('ClientHomeScreen')}>
+        <TouchableOpacity style={styles.footerIcon} onPress={() => navigation.navigate('BeauticianHomeScreen')}>
           <Icon name="home" size={24} color="#075eec" />
           <Text style={styles.footerIconText}>Home</Text>
         </TouchableOpacity>
@@ -87,7 +87,7 @@ const ClientProfile = () => {
           <Icon name="calendar" size={24} color="#075eec" />
           <Text style={styles.footerIconText}>Appointments</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerIcon} onPress={() => navigation.navigate('ClientProfile')}>
+        <TouchableOpacity style={styles.footerIcon} onPress={() => navigation.navigate('BeauticianProfile')}>
           <Icon name="user" size={24} color="#075eec" />
           <Text style={styles.footerIconText}>Profile</Text>
         </TouchableOpacity>
@@ -97,7 +97,7 @@ const ClientProfile = () => {
   );
 };
 
-export default ClientProfile;
+export default BeauticianProfile;
 
 const styles = StyleSheet.create({
   container: {

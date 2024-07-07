@@ -1,6 +1,4 @@
-
-import React, { useState } from "react";
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -10,35 +8,36 @@ import {
   TextInput,
   ScrollView,
   Alert,
-  ActivityIndicator
-} from "react-native";
-import axios from "axios";
-import { MaterialIcons } from "@expo/vector-icons"; // Assuming you use Expo for vector icons
-import Config from './config'; // Import the config file
+  ActivityIndicator,
+} from 'react-native';
+import axios from 'axios';
+import Config from './config';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
-
-export default function Signup() {
+export default function Signup({ navigation }) {
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    gender: "",
-    email: "",
-    password: "",
-    passwordConfirmation: "",
+    firstName: '',
+    lastName: '',
+    phone: '',
+    gender: '',
+    userType: '',
+    email: '',
+    password: '',
+    passwordConfirmation: '',
+    Business_ID: '', // Added businessID field
   });
 
   const [errors, setErrors] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    gender: "",
-    email: "",
-    password: "",
-    passwordConfirmation: "",
+    firstName: '',
+    lastName: '',
+    phone: '',
+    gender: '',
+    userType: '',
+    email: '',
+    password: '',
+    passwordConfirmation: '',
+    businessID: '', // Added businessID field
   });
-
-  const navigation = useNavigation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
@@ -47,121 +46,128 @@ export default function Signup() {
     let valid = true;
     let newErrors = { ...errors };
 
-    if (form.firstName.trim() === "") {
-      newErrors.firstName = "First Name is required";
+    if (form.firstName.trim() === '') {
+      newErrors.firstName = 'First Name is required';
       valid = false;
     } else {
-      newErrors.firstName = "";
+      newErrors.firstName = '';
     }
 
-    if (form.lastName.trim() === "") {
-      newErrors.lastName = "Last Name is required";
+    if (form.lastName.trim() === '') {
+      newErrors.lastName = 'Last Name is required';
       valid = false;
     } else {
-      newErrors.lastName = "";
+      newErrors.lastName = '';
     }
 
-    if (form.phone.trim() === "") {
-      newErrors.phone = "Phone Number is required";
+    if (form.phone.trim() === '') {
+      newErrors.phone = 'Phone Number is required';
       valid = false;
     } else {
-      newErrors.phone = "";
+      newErrors.phone = '';
     }
 
-    if (form.gender.trim() === "") {
-      newErrors.gender = "Gender is required";
+    if (form.gender.trim() === '') {
+      newErrors.gender = 'Gender is required';
       valid = false;
     } else {
-      newErrors.gender = "";
+      newErrors.gender = '';
     }
 
-    if (form.email.trim() === "") {
-      newErrors.email = "Email Address is required";
+    if (form.userType.trim() === '') {
+      newErrors.userType = 'User Type is required';
       valid = false;
     } else {
-      newErrors.email = "";
+      newErrors.userType = '';
     }
 
-    if (form.password.trim() === "") {
-      newErrors.password = "Password is required";
+    if (form.email.trim() === '') {
+      newErrors.email = 'Email Address is required';
+      valid = false;
+    } else {
+      newErrors.email = '';
+    }
+
+    if (form.password.trim() === '') {
+      newErrors.password = 'Password is required';
       valid = false;
     } else if (form.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
+      newErrors.password = 'Password must be at least 8 characters long';
       valid = false;
     } else {
-      newErrors.password = "";
+      newErrors.password = '';
     }
 
-    if (form.passwordConfirmation.trim() === "") {
-      newErrors.passwordConfirmation = "Please confirm your password";
+    if (form.passwordConfirmation.trim() === '') {
+      newErrors.passwordConfirmation = 'Please confirm your password';
       valid = false;
     } else if (form.passwordConfirmation !== form.password) {
-      newErrors.passwordConfirmation = "Passwords do not match";
+      newErrors.passwordConfirmation = 'Passwords do not match';
       valid = false;
     } else {
-      newErrors.passwordConfirmation = "";
+      newErrors.passwordConfirmation = '';
+    }
+
+    if (form.userType === 'Beautician' && form.businessID.trim() === '') {
+      newErrors.businessID = 'Business ID is required for beauticians';
+      valid = false;
+    } else {
+      newErrors.businessID = '';
     }
 
     setErrors(newErrors);
     return valid;
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (validateForm()) {
       setLoading(true); // Start loading
-  
-      axios
-        .post(`${Config.API_URL}/api/signup`, form)
-        .then((response) => {
-          console.log("User created successfully:", response.data);
-          // Show verification message to user
+
+      try {
+        const response = await axios.post(`${Config.API_URL}/api/signup`, form);
+
+        if (response.status === 200) {
+          // Store user ID and userType in AsyncStorage
+          await AsyncStorage.setItem('userID', response.data.userID.toString());
+          await AsyncStorage.setItem('userType', form.userType);
+
           Alert.alert(
-            "Signup Successful",
-            "Please check your email to verify your account."
+            'Signup Successful',
+            'Please check your email to verify your account.'
           );
-  
-          // Clear the form and stop loading
-          setForm({
-            firstName: "",
-            lastName: "",
-            phone: "",
-            gender: "",
-            email: "",
-            password: "",
-            passwordConfirmation: "",
-          });
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error creating user:", error);
-          if (error.response && error.response.status === 409) {
-            Alert.alert(
-              "Signup Failed",
-              "Email already exists. Please use a different email address."
-            );
-          } else {
-            Alert.alert(
-              "Signup Failed",
-              "An error occurred while signing up. Please try again later."
-            );
-          }
-          setLoading(false); // Stop loading on error
-        });
+
+          navigation.navigate('Login');
+        }
+      } catch (error) {
+        console.error('Error creating user:', error);
+        if (error.response && error.response.status === 409) {
+          Alert.alert(
+            'Signup Failed',
+            'Email already exists. Please use a different email address.'
+          );
+        } else {
+          Alert.alert(
+            'Signup Failed',
+            'An error occurred while signing up. Please try again later.'
+          );
+        }
+      } finally {
+        setLoading(false); // Stop loading
+      }
     } else {
       Alert.alert(
-        "Validation Error",
-        "Please fill out all required fields correctly."
+        'Validation Error',
+        'Please fill out all required fields correctly.'
       );
     }
   };
-  
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#e8ecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#e8ecf4' }}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            Sign Up to <Text style={{ color: "#075eec" }}>Splendr</Text>
+            Sign Up to <Text style={{ color: '#075eec' }}>Splendr</Text>
           </Text>
           <Text style={styles.subtitle}>
             The Ultimate Beauty booking application
@@ -234,6 +240,43 @@ export default function Signup() {
           </View>
 
           <View style={styles.input}>
+            <Text style={styles.inputLabel}>User Type</Text>
+            <View style={styles.radioContainer}>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setForm({ ...form, userType: 'Client' })}
+              >
+                <View style={[styles.radioCircle, form.userType === 'Client' && styles.selectedRadioCircle]} />
+                <Text style={styles.radioText}>Client</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setForm({ ...form, userType: 'Beautician' })}
+              >
+                <View style={[styles.radioCircle, form.userType === 'Beautician' && styles.selectedRadioCircle]} />
+                <Text style={styles.radioText}>Beautician</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.errorText}>{errors.userType}</Text>
+          </View>
+
+          {form.userType === 'Beautician' && (
+            <View style={styles.input}>
+              <Text style={styles.inputLabel}>Business ID</Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                onChangeText={(businessID) => setForm({ ...form, businessID })}
+                placeholder="1"
+                placeholderTextColor="#6b7280"
+                style={styles.inputControl}
+                value={form.businessID}
+              />
+              <Text style={styles.errorText}>{errors.businessID}</Text>
+            </View>
+          )}
+
+          <View style={styles.input}>
             <Text style={styles.inputLabel}>Email address</Text>
             <TextInput
               autoCapitalize="none"
@@ -241,7 +284,7 @@ export default function Signup() {
               clearButtonMode="while-editing"
               keyboardType="email-address"
               onChangeText={(email) => setForm({ ...form, email })}
-              placeholder="john@example.com"
+              placeholder="you@email.com"
               placeholderTextColor="#6b7280"
               style={styles.inputControl}
               value={form.email}
@@ -251,90 +294,67 @@ export default function Signup() {
 
           <View style={styles.input}>
             <Text style={styles.inputLabel}>Password</Text>
-            <View
-              style={[
-                styles.inputControl,
-                { flexDirection: "row", alignItems: "center" },
-              ]}
-            >
-              <TextInput
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                onChangeText={(password) => setForm({ ...form, password })}
-                placeholder="********"
-                placeholderTextColor="#6b7280"
-                style={{ flex: 1, height: 50, fontSize: 15, color: "#222" }}
-                secureTextEntry={!showPassword}
-                value={form.password}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <MaterialIcons
-                  name={showPassword ? "visibility-off" : "visibility"}
-                  size={24}
-                  color="#6b7280"
-                />
-              </TouchableOpacity>
-            </View>
+            <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
+              onChangeText={(password) => setForm({ ...form, password })}
+              placeholder="Enter Password"
+              placeholderTextColor="#6b7280"
+              secureTextEntry={!showPassword}
+              style={styles.inputControl}
+              value={form.password}
+            />
             <Text style={styles.errorText}>{errors.password}</Text>
-            <Text style={styles.passwordHint}>Password must be at least 8 characters long</Text>
           </View>
 
           <View style={styles.input}>
             <Text style={styles.inputLabel}>Confirm Password</Text>
-            <View
-              style={[
-                styles.inputControl,
-                { flexDirection: "row", alignItems: "center" },
-              ]}
-            >
-              <TextInput
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                onChangeText={(passwordConfirmation) =>
-                  setForm({ ...form, passwordConfirmation })
-                }
-                placeholder="********"
-                placeholderTextColor="#6b7280"
-                style={{ flex: 1, height: 50, fontSize: 15, color: "#222" }}
-                secureTextEntry={!showPassword}
-                value={form.passwordConfirmation}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <MaterialIcons
-                  name={showPassword ? "visibility-off" : "visibility"}
-                  size={24}
-                  color="#6b7280"
-                />
-              </TouchableOpacity>
-            </View>
+            <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
+              onChangeText={(passwordConfirmation) => setForm({ ...form, passwordConfirmation })}
+              placeholder="Confirm Password"
+              placeholderTextColor="#6b7280"
+              secureTextEntry={!showPassword}
+              style={styles.inputControl}
+              value={form.passwordConfirmation}
+            />
             <Text style={styles.errorText}>{errors.passwordConfirmation}</Text>
           </View>
 
-          {/* Show spinner while loading */}
-          {loading ? (
-            <ActivityIndicator size="large" color="#075eec" style={{ marginTop: 20 }} />
-          ) : (
-            <TouchableOpacity onPress={handleSignup}>
-              <View style={styles.btn}>
-                <Text style={styles.btnText}>Sign Up</Text>
-              </View>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.showPassword}
+          >
+            <Text style={styles.showPasswordText}>
+              {showPassword ? 'Hide' : 'Show'} Password
+            </Text>
+          </TouchableOpacity>
 
-          <View style={styles.formAction}>
-            
-          </View>
+          <TouchableOpacity
+            onPress={handleSignup}
+            style={styles.signupButton}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.signupButtonText}>Sign Up</Text>
+            )}
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Login')}
-          style={{ marginTop: 'auto' }}
-        >
-          <Text style={styles.formFooter}>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
             Already have an account?{' '}
-            <Text style={{ textDecorationLine: 'underline' }}>Login</Text>
+            <Text
+              onPress={() => navigation.navigate('Login')}
+              style={{ color: '#075eec' }}
+            >
+              Login
+            </Text>
           </Text>
-        </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -342,119 +362,94 @@ export default function Signup() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 24,
     paddingHorizontal: 24,
-    flexGrow: 1,
-  },
-  title: {
-    fontSize: 31,
-    fontWeight: "700",
-    color: "#1D2A32",
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#929292",
+    paddingVertical: 40,
   },
   header: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 36,
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  title: {
+    color: '#222',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    color: '#707070',
+    fontSize: 16,
   },
   form: {
-    marginBottom: 24,
-    flexGrow: 1,
+    marginBottom: 32,
   },
   input: {
     marginBottom: 16,
   },
   inputLabel: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#222",
-    marginBottom: 8,
+    color: '#333',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
   },
   inputControl: {
-    height: 50,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#222",
+    backgroundColor: '#fff',
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#C9D3DB",
-    borderStyle: "solid",
-  },
-  formAction: {
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    backgroundColor: "#075eec",
-    borderColor: "#075eec",
-  },
-  btnText: {
-    fontSize: 18,
-    lineHeight: 26,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  formLink: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#075eec",
-    textAlign: "center",
-  },
-  formFooter: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#222",
-    textAlign: "center",
-    letterSpacing: 0.15,
-  },
-  errorText: {
-    fontSize: 12,
-    color: "red",
-    marginTop: 4,
-  },
-  passwordHint: {
-    fontSize: 12,
-    color: "#6b7280",
-    marginTop: 4,
+    borderColor: '#e5e7eb',
+    fontSize: 14,
+    padding: 12,
   },
   radioContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 8,
   },
   radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#C9D3DB",
-    alignItems: "center",
-    justifyContent: "center",
+    height: 16,
+    width: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#075eec',
+    marginRight: 8,
   },
   selectedRadioCircle: {
-    backgroundColor: "#075eec",
+    backgroundColor: '#075eec',
   },
   radioText: {
-    marginLeft: 8,
+    color: '#333',
+  },
+  showPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 32,
+  },
+  showPasswordText: {
+    color: '#075eec',
+    fontSize: 14,
+  },
+  signupButton: {
+    backgroundColor: '#075eec',
+    borderRadius: 8,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  signupButtonText: {
+    color: '#fff',
     fontSize: 16,
-    color: "#222",
+    fontWeight: '500',
+  },
+  footer: {
+    alignItems: 'center',
+  },
+  footerText: {
+    color: '#333',
+    fontSize: 14,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 4,
   },
 });

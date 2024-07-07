@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook from React Navigation
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Config from './config';
 
 const ServiceListScreen = () => {
   const [loading, setLoading] = useState(true);
   const [serviceData, setServiceData] = useState([]);
-  const navigation = useNavigation(); // Initialize navigation object
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { business } = route.params;
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -25,8 +27,7 @@ const ServiceListScreen = () => {
   }, []);
 
   const handleBookButtonPress = (item) => {
-    // Navigate to BeauticianListScreen passing service details
-    navigation.navigate('BeauticianListScreen', { service: item });
+    navigation.navigate('BeauticianListScreen', { service: item, business });
   };
 
   const renderServiceItem = ({ item }) => (
@@ -34,11 +35,11 @@ const ServiceListScreen = () => {
       <View style={styles.serviceDetails}>
         <Text style={styles.serviceName}>{item.name}</Text>
         <Text style={styles.serviceCost}>{item.cost} Ksh</Text>
-        <Text style={styles.serviceDuration}>{item.duration} </Text>
+        <Text style={styles.serviceDuration}>{item.duration}</Text>
       </View>
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={() => handleBookButtonPress(item)} // Pass item to handleBookButtonPress
+        onPress={() => handleBookButtonPress(item)}
       >
         <Text style={styles.bookButtonText}>Book</Text>
       </TouchableOpacity>
@@ -52,7 +53,7 @@ const ServiceListScreen = () => {
       ) : (
         <FlatList
           data={serviceData}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => (item.id ? item.id.toString() : Math.random().toString())}
           renderItem={renderServiceItem}
           contentContainerStyle={styles.serviceList}
         />

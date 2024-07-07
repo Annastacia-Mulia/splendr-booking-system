@@ -8,10 +8,11 @@ import {
   TextInput,
   ScrollView,
   Alert,
-  ActivityIndicator, // Import ActivityIndicator for built-in spinner
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
-import Config from './config'; // Import the config file
+import Config from './config';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 export default function Login({ navigation }) {
   const [form, setForm] = useState({
@@ -20,10 +21,10 @@ export default function Login({ navigation }) {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    setIsLoading(true); // Set loading state to true when login starts
+    setIsLoading(true);
     try {
       const response = await axios.post(`${Config.API_URL}/api/login`, {
         email: form.email,
@@ -31,8 +32,18 @@ export default function Login({ navigation }) {
       });
 
       if (response.status === 200) {
+        // Store user ID and userType in AsyncStorage
+        await AsyncStorage.setItem('userID', response.data.userID.toString());
+        await AsyncStorage.setItem('userType', response.data.userType);
+
         Alert.alert('Success', 'Login successful');
-        navigation.navigate('ClientHomeScreen');
+
+        // Redirect to the respective home screen based on userType
+        if (response.data.userType === 'Client') {
+          navigation.navigate('ClientHomeScreen');
+        } else if (response.data.userType === 'Beautician') {
+          navigation.navigate('BeauticianHomeScreen');
+        }
       }
     } catch (error) {
       console.error(error);
@@ -42,7 +53,7 @@ export default function Login({ navigation }) {
         Alert.alert('Error', 'An error occurred. Please try again.');
       }
     } finally {
-      setIsLoading(false); // Set loading state to false when login finishes
+      setIsLoading(false);
     }
   };
 
