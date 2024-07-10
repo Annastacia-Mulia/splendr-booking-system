@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -8,12 +8,11 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import axios from 'axios';
-import Config from './config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/FontAwesome';
-
+} from "react-native";
+import axios from "axios";
+import Config from "../Server/config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function BeauticianHomeScreen({ navigation }) {
   const [appointments, setAppointments] = useState([]);
@@ -23,16 +22,19 @@ export default function BeauticianHomeScreen({ navigation }) {
     const fetchAppointments = async () => {
       setIsLoading(true);
       try {
-        const userID = await AsyncStorage.getItem('userID');
-        const response = await axios.get(`${Config.API_URL}/api/appointments`, {
-          params: { beauticianID: userID },
-        });
+        const beauticianID = await AsyncStorage.getItem("userID");
+        const response = await axios.get(
+          `${Config.API_URL}/api/appointments-view`,
+          {
+            params: { beauticianID },
+          }
+        );
         if (response.status === 200) {
-          setAppointments(response.data.appointments);
+          setAppointments(response.data);
         }
       } catch (error) {
-        console.error(error);
-        Alert.alert('Error', 'Failed to load appointments.');
+        console.error("Error fetching appointments:", error);
+        Alert.alert("Error", "Failed to load appointments.");
       } finally {
         setIsLoading(false);
       }
@@ -41,34 +43,69 @@ export default function BeauticianHomeScreen({ navigation }) {
     fetchAppointments();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.appointmentCard}>
-      <Text style={styles.appointmentText}>Client: {item.clientName}</Text>
-      <Text style={styles.appointmentText}>Date: {item.date}</Text>
-      <Text style={styles.appointmentText}>Time: {item.time}</Text>
+  const handleApprove = (appointmentId) => {
+    // Logic to handle approval of appointment with ID `appointmentId`
+    Alert.alert(
+      "Appointment Approved",
+      `Appointment ${appointmentId} has been approved.`
+    );
+  };
+
+  // Inside BeauticianHomeScreen component
+
+  const handleDone = (appointmentId) => {
+    // Logic to handle marking appointment as done with ID `appointmentId`
+    Alert.alert(
+      "Appointment Completed",
+      `Appointment ${appointmentId} has been marked as done.`
+    );
+
+    // Filter out the appointment with the given appointmentId
+    const updatedAppointments = appointments.filter(
+      (item) => item.id !== appointmentId
+    );
+    setAppointments(updatedAppointments);
+  };
+
+  const renderAppointmentItem = ({ item }) => (
+    <View style={styles.appointmentItem}>
+      <Text style={styles.label}>Client: </Text>
+      <Text style={styles.value}>{item.clientName}Lisa</Text>
+      <Text style={styles.label}>Business:</Text>
+      <Text style={styles.value}>{item.businessName}</Text>
+      <Text style={styles.label}>Service:</Text>
+      <Text style={styles.value}>{item.serviceName}</Text>
+      <Text style={styles.label}>Date:</Text>
+      <Text style={styles.value}>
+        {new Date(item.date).toLocaleDateString()}
+      </Text>
+      <Text style={styles.label}>Time:</Text>
+      <Text style={styles.value}>{item.time}</Text>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.approveButton]}
+          onPress={() => handleApprove(item.id)}
+        >
+          <Text style={styles.buttonText}>Approve</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.doneButton]}
+          onPress={() => handleDone(item.id)}
+        >
+          <Text style={styles.buttonText}>Done</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome, Beautician</Text>
-      </View>
-
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('ManageServices')}
-        >
-          <Text style={styles.actionButtonText}>Manage Services</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('BeauticianProfile')}
-        >
-          <Text style={styles.actionButtonText}>Profile</Text>
-        </TouchableOpacity>
+        <Text style={styles.title}>Welcome to Splendr</Text>
+        <Text style={styles.subtitle}>
+          The Ultimate Beauty Booking Application
+        </Text>
       </View>
 
       <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
@@ -77,29 +114,30 @@ export default function BeauticianHomeScreen({ navigation }) {
       ) : (
         <FlatList
           data={appointments}
-          renderItem={renderItem}
+          renderItem={renderAppointmentItem}
           keyExtractor={(item) => item.id.toString()}
-          ListEmptyComponent={<Text style={styles.noAppointments}>No upcoming appointments</Text>}
+          ListEmptyComponent={
+            <Text style={styles.noAppointments}>No upcoming appointments</Text>
+          }
         />
       )}
 
-
-<View style={styles.footer}>
-        <TouchableOpacity style={styles.footerIcon} onPress={() => navigation.navigate('ClientHomeScreen')}>
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.footerIcon}
+          onPress={() => navigation.navigate("BeauticianHomeScreen")}
+        >
           <Icon name="home" size={24} color="#075eec" />
           <Text style={styles.footerIconText}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerIcon} onPress={() => navigation.navigate('AppointmentBookingScreen')}>
-          <Icon name="calendar" size={24} color="#075eec" />
-          <Text style={styles.footerIconText}>Appointments</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerIcon} onPress={() => navigation.navigate('ClientProfile')}>
+        <TouchableOpacity
+          style={styles.footerIcon}
+          onPress={() => navigation.navigate("BeauticianProfileScreen")}
+        >
           <Icon name="user" size={24} color="#075eec" />
           <Text style={styles.footerIconText}>Profile</Text>
         </TouchableOpacity>
       </View>
-
-
     </SafeAreaView>
   );
 }
@@ -107,73 +145,95 @@ export default function BeauticianHomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e8ecf4',
+    backgroundColor: "#e8ecf4",
     padding: 16,
   },
   header: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 20,
+    alignItems: "center",
+    marginVertical: 36,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1D2A32',
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#075eec",
+    marginBottom: 6,
   },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 20,
-  },
-  actionButton: {
-    backgroundColor: '#075eec',
-    padding: 12,
-    borderRadius: 8,
-  },
-  actionButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#929292",
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#1D2A32',
+    fontWeight: "600",
+    color: "#1D2A32",
     marginBottom: 12,
   },
-  appointmentCard: {
-    backgroundColor: '#fff',
-    padding: 16,
+  appointmentItem: {
+    backgroundColor: "#fff",
     borderRadius: 8,
-    marginVertical: 8,
-    borderColor: '#C9D3DB',
-    borderWidth: 1,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  appointmentText: {
-    fontSize: 16,
-    color: '#1D2A32',
+  label: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#0096FF",
+  },
+  value: {
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 8,
   },
   noAppointments: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 20,
     fontSize: 16,
-    color: '#929292',
+    color: "#929292",
   },
-
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#fff",
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: '#e8ecf4',
+    borderTopColor: "#e8ecf4",
   },
   footerIcon: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerIconText: {
     fontSize: 12,
-    color: '#075eec',
+    color: "#075eec",
   },
-
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  button: {
+    borderRadius: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 100,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  approveButton: {
+    backgroundColor: "#3CB371", // Green color for approve button
+  },
+  doneButton: {
+    backgroundColor: "#1E90FF", // Blue color for done button
+  },
 });
