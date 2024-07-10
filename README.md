@@ -83,3 +83,78 @@ Managing Users (Admin Panel):
 * Input: User details, Appointment details, User profiles.
 * Output: Appointment bookings, Beautician ratings, User management data
 
+
+## **Project Structure:**
+
+SplendrApp
+|
+├──nodemodules
+├──.expo
+|    ├── devices.json
+|    |
+|    |
+|    |
+|    |
+|    ├──App
+|    |    ├───Components
+│    |    |       SignInWithOAuth.js
+│    |    |       style.js
+|    |    |
+|    |    |
+|    |    ├───Screens
+│    |           │   AllAppointments.js
+│    |           │   AppointmentBookingScreen.js
+│    |           │   AppointmentConfirmationScreen.js
+│    |           │   AppointmentScreen.js
+│    |           │   BeauticianHomeScreen.js
+│    |           │   beauticianListScreen.js
+│    |           │   BeauticianProfile.js
+│    |           │   BeauticianProfileScreen.js
+│    |           │   BusinessDetailsScreen.js
+│    |           │   BusinessListScreen.js
+│    |           │   BusinessScreen.js
+│    |           │   ClientHomeScreen.js
+│    |           │   EditProfileSreen.js
+│    |           │   ForgotPassword.js
+│    |           │   Login.js
+│    |           │   LogoutConfirmation.js
+│    |           │   MyAppointmentsScreen.js
+│    |           │   Profile.js
+│    |           │   ProfileScreen.js
+│    |           │   RatingScreen.js
+│    |           │   request-password-reset.js
+│    |           │   RescheduleAppointmentScreen.js
+│    |           │   ResetPassword.js
+│    |           │   sendVerificationEmail.js
+│    |           │   ServiceListScreen.js
+│    |           │   Signup.js
+│    |           │   signupController.js
+│    |           │   verifyController.js
+│    |           └───  verifyEmailScreen.js
+│    |          
+│    └───public
+│           reset-password.html
+│           verify-password.html
+├───assets
+|      hair.png
+|      barber.png
+|      nails.png
+|
+├───src
+|      App.js
+|      app.json
+├      package-lock.json
+|      package.json
+|
+├───Server
+│       config.js
+│       server.js
+│
+└───services
+        Storage.js
+
+ ### Key Files
+- src/App.js - contains the structure and the logic for the app's user interface
+- Server/server.js This file runs the backend api endpoints and it allows connection to the database.
+
+
