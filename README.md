@@ -85,7 +85,7 @@ Managing Users (Admin Panel):
 
 
 ## **Project Structure:**
-
+```
 SplendrApp
 |
 ├──nodemodules
@@ -152,7 +152,7 @@ SplendrApp
 │
 └───services
         Storage.js
-
+```
 
  ### Key Files
 - src/App.js - contains the structure and the logic for the app's user interface
