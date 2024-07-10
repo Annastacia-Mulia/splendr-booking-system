@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -9,34 +9,34 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import axios from 'axios';
-import Config from './config';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+} from "react-native";
+import axios from "axios";
+import Config from "../Server/config";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
 export default function Signup({ navigation }) {
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    gender: '',
-    userType: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
-    Business_ID: '', // Added businessID field
+    firstName: "",
+    lastName: "",
+    phone: "",
+    gender: "",
+    userType: "",
+    email: "",
+    password: "",
+    passwordConfirmation: "",
+    Business_ID: "", // Added businessID field
   });
 
   const [errors, setErrors] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    gender: '',
-    userType: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
-    businessID: '', // Added businessID field
+    firstName: "",
+    lastName: "",
+    phone: "",
+    gender: "",
+    userType: "",
+    email: "",
+    password: "",
+    passwordConfirmation: "",
+    businessID: "", // Added businessID field
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -46,73 +46,73 @@ export default function Signup({ navigation }) {
     let valid = true;
     let newErrors = { ...errors };
 
-    if (form.firstName.trim() === '') {
-      newErrors.firstName = 'First Name is required';
+    if (form.firstName.trim() === "") {
+      newErrors.firstName = "First Name is required";
       valid = false;
     } else {
-      newErrors.firstName = '';
+      newErrors.firstName = "";
     }
 
-    if (form.lastName.trim() === '') {
-      newErrors.lastName = 'Last Name is required';
+    if (form.lastName.trim() === "") {
+      newErrors.lastName = "Last Name is required";
       valid = false;
     } else {
-      newErrors.lastName = '';
+      newErrors.lastName = "";
     }
 
-    if (form.phone.trim() === '') {
-      newErrors.phone = 'Phone Number is required';
+    if (form.phone.trim() === "") {
+      newErrors.phone = "Phone Number is required";
       valid = false;
     } else {
-      newErrors.phone = '';
+      newErrors.phone = "";
     }
 
-    if (form.gender.trim() === '') {
-      newErrors.gender = 'Gender is required';
+    if (form.gender.trim() === "") {
+      newErrors.gender = "Gender is required";
       valid = false;
     } else {
-      newErrors.gender = '';
+      newErrors.gender = "";
     }
 
-    if (form.userType.trim() === '') {
-      newErrors.userType = 'User Type is required';
+    if (form.userType.trim() === "") {
+      newErrors.userType = "User Type is required";
       valid = false;
     } else {
-      newErrors.userType = '';
+      newErrors.userType = "";
     }
 
-    if (form.email.trim() === '') {
-      newErrors.email = 'Email Address is required';
+    if (form.email.trim() === "") {
+      newErrors.email = "Email Address is required";
       valid = false;
     } else {
-      newErrors.email = '';
+      newErrors.email = "";
     }
 
-    if (form.password.trim() === '') {
-      newErrors.password = 'Password is required';
+    if (form.password.trim() === "") {
+      newErrors.password = "Password is required";
       valid = false;
     } else if (form.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long';
+      newErrors.password = "Password must be at least 8 characters long";
       valid = false;
     } else {
-      newErrors.password = '';
+      newErrors.password = "";
     }
 
-    if (form.passwordConfirmation.trim() === '') {
-      newErrors.passwordConfirmation = 'Please confirm your password';
+    if (form.passwordConfirmation.trim() === "") {
+      newErrors.passwordConfirmation = "Please confirm your password";
       valid = false;
     } else if (form.passwordConfirmation !== form.password) {
-      newErrors.passwordConfirmation = 'Passwords do not match';
+      newErrors.passwordConfirmation = "Passwords do not match";
       valid = false;
     } else {
-      newErrors.passwordConfirmation = '';
+      newErrors.passwordConfirmation = "";
     }
 
-    if (form.userType === 'Beautician' && form.businessID.trim() === '') {
-      newErrors.businessID = 'Business ID is required for beauticians';
+    if (form.userType === "Beautician" && form.businessID.trim() === "") {
+      newErrors.businessID = "Business ID is required for beauticians";
       valid = false;
     } else {
-      newErrors.businessID = '';
+      newErrors.businessID = "";
     }
 
     setErrors(newErrors);
@@ -128,27 +128,27 @@ export default function Signup({ navigation }) {
 
         if (response.status === 200) {
           // Store user ID and userType in AsyncStorage
-          await AsyncStorage.setItem('userID', response.data.userID.toString());
-          await AsyncStorage.setItem('userType', form.userType);
+          await AsyncStorage.setItem("userID", response.data.userID.toString());
+          await AsyncStorage.setItem("userType", form.userType);
 
           Alert.alert(
-            'Signup Successful',
-            'Please check your email to verify your account.'
+            "Signup Successful",
+            "Please check your email to verify your account."
           );
 
-          navigation.navigate('Login');
+          navigation.navigate("Login");
         }
       } catch (error) {
-        console.error('Error creating user:', error);
+        console.error("Error creating user:", error);
         if (error.response && error.response.status === 409) {
           Alert.alert(
-            'Signup Failed',
-            'Email already exists. Please use a different email address.'
+            "Signup Failed",
+            "Email already exists. Please use a different email address."
           );
         } else {
           Alert.alert(
-            'Signup Failed',
-            'An error occurred while signing up. Please try again later.'
+            "Signup Failed",
+            "An error occurred while signing up. Please try again later."
           );
         }
       } finally {
@@ -156,18 +156,18 @@ export default function Signup({ navigation }) {
       }
     } else {
       Alert.alert(
-        'Validation Error',
-        'Please fill out all required fields correctly.'
+        "Validation Error",
+        "Please fill out all required fields correctly."
       );
     }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#e8ecf4' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#e8ecf4" }}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>
-            Sign Up to <Text style={{ color: '#075eec' }}>Splendr</Text>
+            Sign Up to <Text style={{ color: "#075eec" }}>Splendr</Text>
           </Text>
           <Text style={styles.subtitle}>
             The Ultimate Beauty booking application
@@ -223,16 +223,26 @@ export default function Signup({ navigation }) {
             <View style={styles.radioContainer}>
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setForm({ ...form, gender: 'Male' })}
+                onPress={() => setForm({ ...form, gender: "Male" })}
               >
-                <View style={[styles.radioCircle, form.gender === 'Male' && styles.selectedRadioCircle]} />
+                <View
+                  style={[
+                    styles.radioCircle,
+                    form.gender === "Male" && styles.selectedRadioCircle,
+                  ]}
+                />
                 <Text style={styles.radioText}>Male</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setForm({ ...form, gender: 'Female' })}
+                onPress={() => setForm({ ...form, gender: "Female" })}
               >
-                <View style={[styles.radioCircle, form.gender === 'Female' && styles.selectedRadioCircle]} />
+                <View
+                  style={[
+                    styles.radioCircle,
+                    form.gender === "Female" && styles.selectedRadioCircle,
+                  ]}
+                />
                 <Text style={styles.radioText}>Female</Text>
               </TouchableOpacity>
             </View>
@@ -244,23 +254,34 @@ export default function Signup({ navigation }) {
             <View style={styles.radioContainer}>
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setForm({ ...form, userType: 'Client' })}
+                onPress={() => setForm({ ...form, userType: "Client" })}
               >
-                <View style={[styles.radioCircle, form.userType === 'Client' && styles.selectedRadioCircle]} />
+                <View
+                  style={[
+                    styles.radioCircle,
+                    form.userType === "Client" && styles.selectedRadioCircle,
+                  ]}
+                />
                 <Text style={styles.radioText}>Client</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setForm({ ...form, userType: 'Beautician' })}
+                onPress={() => setForm({ ...form, userType: "Beautician" })}
               >
-                <View style={[styles.radioCircle, form.userType === 'Beautician' && styles.selectedRadioCircle]} />
+                <View
+                  style={[
+                    styles.radioCircle,
+                    form.userType === "Beautician" &&
+                      styles.selectedRadioCircle,
+                  ]}
+                />
                 <Text style={styles.radioText}>Beautician</Text>
               </TouchableOpacity>
             </View>
             <Text style={styles.errorText}>{errors.userType}</Text>
           </View>
 
-          {form.userType === 'Beautician' && (
+          {form.userType === "Beautician" && (
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Business ID</Text>
               <TextInput
@@ -312,7 +333,9 @@ export default function Signup({ navigation }) {
             <TextInput
               autoCapitalize="none"
               autoCorrect={false}
-              onChangeText={(passwordConfirmation) => setForm({ ...form, passwordConfirmation })}
+              onChangeText={(passwordConfirmation) =>
+                setForm({ ...form, passwordConfirmation })
+              }
               placeholder="Confirm Password"
               placeholderTextColor="#6b7280"
               secureTextEntry={!showPassword}
@@ -327,7 +350,7 @@ export default function Signup({ navigation }) {
             style={styles.showPassword}
           >
             <Text style={styles.showPasswordText}>
-              {showPassword ? 'Hide' : 'Show'} Password
+              {showPassword ? "Hide" : "Show"} Password
             </Text>
           </TouchableOpacity>
 
@@ -346,10 +369,10 @@ export default function Signup({ navigation }) {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Text
-              onPress={() => navigation.navigate('Login')}
-              style={{ color: '#075eec' }}
+              onPress={() => navigation.navigate("Login")}
+              style={{ color: "#075eec" }}
             >
               Login
             </Text>
@@ -366,16 +389,16 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
   },
   title: {
-    color: '#222',
+    color: "#222",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subtitle: {
-    color: '#707070',
+    color: "#707070",
     fontSize: 16,
   },
   form: {
@@ -385,70 +408,70 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   inputLabel: {
-    color: '#333',
+    color: "#333",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 4,
   },
   inputControl: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: "#e5e7eb",
     fontSize: 14,
     padding: 12,
   },
   radioContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginTop: 8,
   },
   radioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   radioCircle: {
     height: 16,
     width: 16,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#075eec',
+    borderColor: "#075eec",
     marginRight: 8,
   },
   selectedRadioCircle: {
-    backgroundColor: '#075eec',
+    backgroundColor: "#075eec",
   },
   radioText: {
-    color: '#333',
+    color: "#333",
   },
   showPassword: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: 32,
   },
   showPasswordText: {
-    color: '#075eec',
+    color: "#075eec",
     fontSize: 14,
   },
   signupButton: {
-    backgroundColor: '#075eec',
+    backgroundColor: "#075eec",
     borderRadius: 8,
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   signupButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   footer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerText: {
-    color: '#333',
+    color: "#333",
     fontSize: 14,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 12,
     marginTop: 4,
   },
