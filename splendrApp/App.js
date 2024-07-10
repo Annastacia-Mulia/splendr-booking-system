@@ -19,8 +19,14 @@ import BusinessListScreen from './App/Screens/BusinessListScreen';
 import BeauticianListScreen from './App/Screens/beauticianListScreen';
 import ServiceListScreen from './App/Screens/ServiceListScreen';
 import AppointmentBookingScreen from './App/Screens/AppointmentBookingScreen';
-import ClientProfile from './App/Screens/ClientProfile';
+import Profile from './App/Screens/Profile';
 import AppointmentConfirmationScreen from './App/Screens/AppointmentConfirmationScreen';
+import BeauticianHomeScreen from './App/Screens/BeauticianHomeScreen';
+import BeauticianProfile from './App/Screens/BeauticianProfile';
+import BeauticianProfileScreen from './App/Screens/BeauticianProfileScreen';
+import MyAppointmentsScreen from './App/Screens/MyAppointmentsScreen';
+import RatingScreen from './App/Screens/RatingScreen';
+import RescheduleAppointmentScreen from './App/Screens/RescheduleAppointmentScreen';
 import * as LocalAuthentication from 'expo-local-authentication';
 
 //import SignInWithOAuth from './App/Components/SignInWithOAuth';
@@ -59,8 +65,14 @@ export default function App() {
           <Stack.Screen name="BeauticianListScreen" component={BeauticianListScreen} />
           <Stack.Screen name="ServiceListScreen" component={ServiceListScreen} />
           <Stack.Screen name="AppointmentBookingScreen" component={AppointmentBookingScreen} />
-          <Stack.Screen name="ClientProfile" component={ClientProfile} />
+          <Stack.Screen name="Profile" component={Profile} />
           <Stack.Screen name="AppointmentConfirmationScreen" component={AppointmentConfirmationScreen} />
+          <Stack.Screen name="BeauticianHomeScreen" component={BeauticianHomeScreen} />
+          <Stack.Screen name="BeauticianProfile" component={BeauticianProfile} />
+          <Stack.Screen name="BeauticianProfileScreen" component={BeauticianProfileScreen} />
+          <Stack.Screen name="MyAppointmentsScreen" component={MyAppointmentsScreen} />
+          <Stack.Screen name="RatingScreen" component={RatingScreen} />
+          <Stack.Screen name="RescheduleAppointmentScreen" component={RescheduleAppointmentScreen} />
 
 
         </Stack.Navigator>
